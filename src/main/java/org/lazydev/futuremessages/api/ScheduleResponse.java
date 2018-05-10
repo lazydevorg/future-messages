@@ -6,26 +6,26 @@ import java.time.Instant;
 
 public class ScheduleResponse {
     private Instant startAt;
-    private String jobId;
+    private String id;
 
     ScheduleResponse(ScheduledJob job) {
         this.startAt = job.getStartAt();
-        this.jobId = job.getJobId();
+        this.id = job.getTriggerId();
     }
 
     public Instant getStartAt() {
         return startAt;
     }
 
-    public String getJobId() {
-        return jobId;
+    public String getId() {
+        return id;
     }
 
     @Override
     public String toString() {
         return "ScheduleResponse{" +
                 "startAt=" + startAt +
-                ", jobId='" + jobId + '\'' +
+                ", id='" + id + '\'' +
                 '}';
     }
 }

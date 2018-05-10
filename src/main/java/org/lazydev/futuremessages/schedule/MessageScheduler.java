@@ -16,26 +16,31 @@ public class MessageScheduler {
     private final Scheduler scheduler;
 
     @Autowired
-    public MessageScheduler(Scheduler scheduler) {
+    public MessageScheduler(Scheduler scheduler) throws SchedulerException {
         this.scheduler = scheduler;
+        buildJob();
     }
 
     public ScheduledJob schedule(Message message) throws SchedulerException {
-        JobDetail job = buildJob(message);
         Trigger trigger = buildTrigger(message);
-        Instant date = scheduler.scheduleJob(job, trigger).toInstant();
-        return new ScheduledJob(date, job.getKey().getName());
+        Instant date = scheduler.scheduleJob(trigger).toInstant();
+        return new ScheduledJob(date, trigger.getKey().getName());
     }
 
     private Trigger buildTrigger(Message message) {
         return TriggerBuilder.newTrigger()
+                .forJob("messageSender")
+                .usingJobData("payload", message.getPayload())
                 .startAt(Date.from(message.getStartAt()))
                 .build();
     }
 
-    private JobDetail buildJob(Message message) {
-        return JobBuilder.newJob(MessageSenderJob.class)
-                .usingJobData("payload", message.getPayload())
+    private JobDetail buildJob() throws SchedulerException {
+        JobDetail job = JobBuilder.newJob(MessageSenderJob.class)
+                .withIdentity("messageSender")
+                .storeDurably()
                 .build();
+        scheduler.addJob(job, true);
+        return job;
     }
 }
