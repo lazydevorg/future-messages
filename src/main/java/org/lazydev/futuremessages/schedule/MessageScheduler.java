@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Service
@@ -22,8 +23,8 @@ public class MessageScheduler {
     public ScheduledJob schedule(Message message) throws SchedulerException {
         JobDetail job = buildJob(message);
         Trigger trigger = buildTrigger(message);
-        Date date = scheduler.scheduleJob(job, trigger);
-        return new ScheduledJob(date, job);
+        Instant date = scheduler.scheduleJob(job, trigger).toInstant();
+        return new ScheduledJob(date, job.getKey().getName());
     }
 
     private Trigger buildTrigger(Message message) {

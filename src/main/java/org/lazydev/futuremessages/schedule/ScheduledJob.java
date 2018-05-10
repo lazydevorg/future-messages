@@ -1,35 +1,30 @@
 package org.lazydev.futuremessages.schedule;
 
-import org.quartz.JobDetail;
 
-import java.util.Date;
+import java.time.Instant;
 
 public class ScheduledJob {
-    private final Date startAt;
-    private final JobDetail jobDetail;
+    private final Instant startAt;
+    private final String jobId;
 
-    ScheduledJob(Date startAt, JobDetail jobDetail) {
+    public ScheduledJob(Instant startAt, String jobId) {
         this.startAt = startAt;
-        this.jobDetail = jobDetail;
+        this.jobId = jobId;
     }
 
-    public Date getStartAt() {
+    public Instant getStartAt() {
         return startAt;
     }
 
-    public JobDetail getJobDetail() {
-        return jobDetail;
-    }
-
     public String getJobId() {
-        return jobDetail.getKey().getName();
+        return jobId;
     }
 
     @Override
     public String toString() {
         return "ScheduledJob{" +
                 "startAt=" + startAt +
-                ", jobDetail=" + jobDetail +
+                ", jobId=" + jobId +
                 '}';
     }
 }

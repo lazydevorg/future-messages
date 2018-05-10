@@ -2,10 +2,10 @@ package org.lazydev.futuremessages.api;
 
 import org.lazydev.futuremessages.schedule.ScheduledJob;
 
-import java.util.Date;
+import java.time.Instant;
 
 public class ScheduleResponse {
-    private Date startAt;
+    private Instant startAt;
     private String jobId;
 
     ScheduleResponse(ScheduledJob job) {
@@ -13,7 +13,7 @@ public class ScheduleResponse {
         this.jobId = job.getJobId();
     }
 
-    public Date getStartAt() {
+    public Instant getStartAt() {
         return startAt;
     }
 
