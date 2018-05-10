@@ -52,7 +52,7 @@ public class ScheduleControllerTest {
                 post("/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(buildMessageJson(startAt)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.startAt", is(startAt.toString())));
     }
 
