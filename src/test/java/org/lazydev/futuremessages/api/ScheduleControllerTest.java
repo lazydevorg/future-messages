@@ -38,7 +38,7 @@ public class ScheduleControllerTest {
     private String buildMessageJson(Instant startAt) throws JsonProcessingException {
         Message message = new Message();
         message.setStartAt(startAt);
-        message.setPayload("example payload");
+        message.setPayloadData("example field", "example payload");
         return mapper.writeValueAsString(message);
     }
 

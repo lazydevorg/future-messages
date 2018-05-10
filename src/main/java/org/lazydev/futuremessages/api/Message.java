@@ -1,32 +1,35 @@
 package org.lazydev.futuremessages.api;
 
-import javax.validation.constraints.Future;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Message {
     @NotNull
-    @Future
+//    @Future
     private Instant startAt;
-    private String payload;
-
-    public Message() {
-    }
+    private Map<String, Object> payload = new HashMap<>();
 
     public Instant getStartAt() {
         return startAt;
-    }
-
-    public String getPayload() {
-        return payload;
     }
 
     public void setStartAt(Instant startAt) {
         this.startAt = startAt;
     }
 
-    public void setPayload(String payload) {
-        this.payload = payload;
+    @JsonAnyGetter
+    public Map<String, Object> getPayload() {
+        return payload;
+    }
+
+    @JsonAnySetter
+    public void setPayloadData(String key, Object value) {
+        payload.put(key, value);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.lazydev.futuremessages.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.lazydev.futuremessages.schedule.MessageScheduler;
 import org.lazydev.futuremessages.schedule.ScheduledJob;
 import org.quartz.SchedulerException;
@@ -26,7 +27,7 @@ public class ScheduleController {
     }
 
     @PostMapping(value = "/schedule", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ScheduleResponse> schedule(@RequestBody @Valid Message message) throws SchedulerException {
+    public ResponseEntity<ScheduleResponse> schedule(@RequestBody @Valid Message message) throws SchedulerException, JsonProcessingException {
         ScheduledJob job = scheduler.schedule(message);
         ScheduleResponse response = new ScheduleResponse(job);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
