@@ -12,17 +12,18 @@ import java.util.Date;
 @Service
 public class MessageScheduler {
     private static final Logger log = LoggerFactory.getLogger(MessageScheduler.class);
-    private Scheduler scheduler;
+    private final Scheduler scheduler;
 
     @Autowired
     public MessageScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
     }
 
-    public Date schedule(Message message) throws SchedulerException {
-        JobDetail job = buildJob();
+    public ScheduledJob schedule(Message message) throws SchedulerException {
+        JobDetail job = buildJob(message);
         Trigger trigger = buildTrigger(message);
-        return scheduler.scheduleJob(job, trigger);
+        Date date = scheduler.scheduleJob(job, trigger);
+        return new ScheduledJob(date, job);
     }
 
     private Trigger buildTrigger(Message message) {
@@ -31,7 +32,9 @@ public class MessageScheduler {
                 .build();
     }
 
-    private JobDetail buildJob() {
-        return JobBuilder.newJob(MessageSenderJob.class).build();
+    private JobDetail buildJob(Message message) {
+        return JobBuilder.newJob(MessageSenderJob.class)
+                .usingJobData("payload", message.getPayload())
+                .build();
     }
 }
