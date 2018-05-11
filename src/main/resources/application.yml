@@ -1,0 +1,14 @@
+logging:
+  level:
+    org.lazydev.futuremessages: DEBUG
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:future-messages
+
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
+    properties:
+      org.quartz.jobStore.isClustered: true
