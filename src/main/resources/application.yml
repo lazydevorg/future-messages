@@ -4,11 +4,9 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:h2:mem:future-messages
+    url: jdbc:h2:mem:future-messages;MVCC=TRUE
 
   quartz:
     job-store-type: jdbc
     jdbc:
       initialize-schema: always
-    properties:
-      org.quartz.jobStore.isClustered: true

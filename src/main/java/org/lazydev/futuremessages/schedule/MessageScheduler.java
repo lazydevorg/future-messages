@@ -1,6 +1,5 @@
 package org.lazydev.futuremessages.schedule;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.lazydev.futuremessages.api.Message;
 import org.quartz.*;
@@ -25,17 +24,18 @@ public class MessageScheduler {
         buildJob();
     }
 
-    public ScheduledJob schedule(Message message) throws SchedulerException, JsonProcessingException {
+    public ScheduledJob schedule(Message message) throws SchedulerException {
         Trigger trigger = buildTrigger(message);
         Instant date = scheduler.scheduleJob(trigger).toInstant();
         return new ScheduledJob(date, trigger.getKey().getName());
     }
 
-    private Trigger buildTrigger(Message message) throws JsonProcessingException {
+    private Trigger buildTrigger(Message message) {
         return TriggerBuilder.newTrigger()
                 .forJob("messageSender")
-                .usingJobData("payload", mapper.writeValueAsString(message.getPayload()))
-                .startAt(Date.from(message.getStartAt()))
+                .usingJobData(new JobDataMap(message.getPayload()))
+                //.startAt(Date.from(message.getStartAt()))
+                .startAt(Date.from(Instant.now()))
                 .build();
     }
 

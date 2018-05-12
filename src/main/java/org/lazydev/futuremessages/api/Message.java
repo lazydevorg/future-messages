@@ -3,6 +3,7 @@ package org.lazydev.futuremessages.api;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 public class Message {
     @NotNull
-//    @Future
+    @Future
     private Instant startAt;
     private Map<String, Object> payload = new HashMap<>();
 

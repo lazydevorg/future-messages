@@ -1,6 +1,7 @@
 package org.lazydev.futuremessages.schedule;
 
 import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +21,8 @@ class MessageSenderJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) {
-        String payload = context.getMergedJobDataMap().getString("payload");
-        Message<String> message = MessageBuilder.withPayload(payload)
+        JobDataMap payload = context.getMergedJobDataMap();
+        Message<JobDataMap> message = MessageBuilder.withPayload(payload)
                 .setHeader("scheduleId", context.getTrigger().getKey().getName())
                 .build();
         output.send(message);
