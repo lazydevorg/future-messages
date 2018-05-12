@@ -10,3 +10,8 @@ spring:
     job-store-type: jdbc
     jdbc:
       initialize-schema: always
+
+  rabbitmq:
+    template:
+      retry:
+        enabled: true
