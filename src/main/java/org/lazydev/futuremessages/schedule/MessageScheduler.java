@@ -7,17 +7,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Date;
 
 @Service
 public class MessageScheduler {
     private static final Logger log = LoggerFactory.getLogger(MessageScheduler.class);
+    private static final String MESSAGE_SENDER_JOB_NAME = "messageSender";
     private final Scheduler scheduler;
 
     @Autowired
-    public MessageScheduler(Scheduler scheduler) throws SchedulerException {
+    public MessageScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
+    }
+
+    @PostConstruct
+    public void init() throws SchedulerException {
         buildJob();
     }
 
@@ -29,16 +35,16 @@ public class MessageScheduler {
 
     private Trigger buildTrigger(Message message) {
         return TriggerBuilder.newTrigger()
-                .forJob("messageSender")
+                .forJob(MESSAGE_SENDER_JOB_NAME)
                 .usingJobData(new JobDataMap(message.getPayload()))
-                //.startAt(Date.from(message.getStartAt()))
-                .startAt(Date.from(Instant.now()))
+                .startAt(Date.from(message.getStartAt()))
+                //.startAt(Date.from(Instant.now()))
                 .build();
     }
 
     private JobDetail buildJob() throws SchedulerException {
         JobDetail job = JobBuilder.newJob(MessageSenderJob.class)
-                .withIdentity("messageSender")
+                .withIdentity(MESSAGE_SENDER_JOB_NAME)
                 .storeDurably()
                 .build();
         scheduler.addJob(job, true);
