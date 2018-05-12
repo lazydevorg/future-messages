@@ -1,6 +1,5 @@
 package org.lazydev.futuremessages.schedule;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.lazydev.futuremessages.api.Message;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -15,12 +14,10 @@ import java.util.Date;
 public class MessageScheduler {
     private static final Logger log = LoggerFactory.getLogger(MessageScheduler.class);
     private final Scheduler scheduler;
-    private final ObjectMapper mapper;
 
     @Autowired
-    public MessageScheduler(Scheduler scheduler, ObjectMapper mapper) throws SchedulerException {
+    public MessageScheduler(Scheduler scheduler) throws SchedulerException {
         this.scheduler = scheduler;
-        this.mapper = mapper;
         buildJob();
     }
 
