@@ -11,8 +11,6 @@ import java.util.Map;
 
 class MessageSenderJob implements Job {
     private static final Logger log = LoggerFactory.getLogger(MessageSenderJob.class);
-
-    @Autowired
     private MessageSender messageSender;
 
     @Override
@@ -20,5 +18,10 @@ class MessageSenderJob implements Job {
         Map<String, Object> payload = context.getMergedJobDataMap().getWrappedMap();
         final String id = context.getTrigger().getKey().getName();
         messageSender.send(id, payload);
+    }
+
+    @Autowired
+    public void setMessageSender(MessageSender messageSender) {
+        this.messageSender = messageSender;
     }
 }
