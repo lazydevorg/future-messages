@@ -32,7 +32,7 @@ public class MessageSchedulerTest {
         verify(scheduler).addJob(captor.capture(), eq(true));
         assertThat(captor.getValue())
                 .extracting("key.name", "key.group", "jobClass.simpleName")
-                .contains("messageSender", "DEFAULT", "MessageSenderJob");
+                .contains("MessageSender", "Futures", "MessageSenderJob");
     }
 
     @Test
