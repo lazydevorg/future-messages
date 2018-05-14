@@ -1,5 +1,7 @@
 package org.lazydev.futuremessages.schedule;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.lazydev.futuremessages.api.Message;
 import org.quartz.*;
 import org.quartz.utils.Key;
@@ -15,13 +17,15 @@ import java.util.Date;
 @Service
 public class MessageScheduler {
     private static final Logger log = LoggerFactory.getLogger(MessageScheduler.class);
-    public static final String MESSAGES_GROUP = "Futures";
+    private static final String MESSAGES_GROUP = "Futures";
     private static final String MESSAGE_SENDER_JOB_NAME = "MessageSender";
     private final Scheduler scheduler;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public MessageScheduler(Scheduler scheduler) {
+    public MessageScheduler(Scheduler scheduler, ObjectMapper objectMapper) {
         this.scheduler = scheduler;
+        this.objectMapper = objectMapper;
     }
 
     @PostConstruct
@@ -29,19 +33,20 @@ public class MessageScheduler {
         buildJob();
     }
 
-    public ScheduledJob schedule(Message message) throws SchedulerException {
+    public ScheduledJob schedule(Message message) throws SchedulerException, JsonProcessingException {
         Trigger trigger = buildTrigger(message);
         Instant date = scheduler.scheduleJob(trigger).toInstant();
         return new ScheduledJob(date, trigger.getKey().getName());
     }
 
-    private Trigger buildTrigger(Message message) {
+    private Trigger buildTrigger(Message message) throws JsonProcessingException {
         return TriggerBuilder.newTrigger()
                 .withIdentity(getTriggerKey())
                 .forJob(MESSAGE_SENDER_JOB_NAME, MESSAGES_GROUP)
-                .usingJobData(new JobDataMap(message.getPayload()))
-                .startAt(Date.from(message.getStartAt()))
-                //.startAt(Date.from(Instant.now()))
+                .usingJobData("destination", message.getDestination())
+                .usingJobData("payload", objectMapper.writeValueAsString(message.getPayload()))
+                .startAt(Date.from(message.getStart()))
+//                .startAt(Date.from(Instant.now()))
                 .build();
     }
 

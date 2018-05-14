@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,38 +33,38 @@ public class ScheduleControllerTest {
     @MockBean
     private MessageScheduler scheduler;
 
-    @Autowired
-    private ObjectMapper mapper;
+    private ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
 
-    private String buildMessageJson(Instant startAt) throws JsonProcessingException {
+    private String buildMessageJson(Instant start) throws JsonProcessingException {
         Message message = new Message();
-        message.setStartAt(startAt);
+        message.setStart(start);
+        message.setDestination("destination");
         message.setPayloadData("example field", "example payload");
-        return mapper.writeValueAsString(message);
+        return objectMapper.writeValueAsString(message);
     }
 
     @Test
     public void scheduleJob() throws Exception {
-        Instant startAt = Instant.now().plusSeconds(60);
-        ScheduledJob job = new ScheduledJob(startAt, UUID.randomUUID().toString());
+        Instant start = Instant.now().plusSeconds(60);
+        ScheduledJob job = new ScheduledJob(start, UUID.randomUUID().toString());
         given(scheduler.schedule(any(Message.class))).willReturn(job);
 
         mvc.perform(
                 post("/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(buildMessageJson(startAt)))
+                        .content(buildMessageJson(start)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.startAt", is(startAt.toString())));
+                .andExpect(jsonPath("$.start", is(start.toString())));
     }
 
     @Test
     public void rejectMessageWithDateInThePast() throws Exception {
-        Instant startAt = Instant.now().minusSeconds(60);
+        Instant start = Instant.now().minusSeconds(60);
 
         mvc.perform(
                 post("/schedule")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(buildMessageJson(startAt)))
+                        .content(buildMessageJson(start)))
                 .andExpect(status().isBadRequest());
     }
 }

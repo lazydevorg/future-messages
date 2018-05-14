@@ -5,16 +5,16 @@ import org.lazydev.futuremessages.schedule.ScheduledJob;
 import java.time.Instant;
 
 public class ScheduleResponse {
-    private Instant startAt;
+    private Instant start;
     private String id;
 
     ScheduleResponse(ScheduledJob job) {
-        this.startAt = job.getStartAt();
+        this.start = job.getStart();
         this.id = job.getTriggerId();
     }
 
-    public Instant getStartAt() {
-        return startAt;
+    public Instant getStart() {
+        return start;
     }
 
     public String getId() {
@@ -24,7 +24,7 @@ public class ScheduleResponse {
     @Override
     public String toString() {
         return "ScheduleResponse{" +
-                "startAt=" + startAt +
+                "start=" + start +
                 ", id='" + id + '\'' +
                 '}';
     }

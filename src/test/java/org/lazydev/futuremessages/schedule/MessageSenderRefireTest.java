@@ -36,7 +36,7 @@ public class MessageSenderRefireTest {
         given(output.send(any())).willThrow(messageHandlingException);
 
         assertThatExceptionOfType(JobExecutionException.class)
-                .isThrownBy(() -> messageSender.send("myid", Collections.singletonMap("field1", "value1")))
+                .isThrownBy(() -> messageSender.send(new FutureMessage("myid", "destination", Collections.singletonMap("field1", "value1"))))
                 .satisfies(e -> assertThat(e.refireImmediately())
                         .describedAs("Job set for immediate refire")
                         .isTrue());

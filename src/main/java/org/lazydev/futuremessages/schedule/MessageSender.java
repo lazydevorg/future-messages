@@ -18,13 +18,17 @@ import java.util.Map;
 @EnableBinding(Source.class)
 public class MessageSender {
     private static final Logger log = LoggerFactory.getLogger(MessageSender.class);
+    private final MessageChannel output;
 
     @Autowired
-    private MessageChannel output;
+    public MessageSender(MessageChannel output) {
+        this.output = output;
+    }
 
-    public boolean send(String id, Map<String, Object> payload) throws JobExecutionException {
-        Message<Map<String, Object>> message = MessageBuilder.withPayload(payload)
-                .setHeader("scheduleId", id)
+    public boolean send(FutureMessage futureMessage) throws JobExecutionException {
+        Message<Map<String, Object>> message = MessageBuilder.withPayload(futureMessage.getPayload())
+                .setHeader("scheduleId", futureMessage.getId())
+                .setHeader("destination", futureMessage.getDestination())
                 .build();
         log.debug("Message {}", message);
         try {

@@ -28,7 +28,7 @@ public class MessageSenderTest {
 
     @Test
     public void send() throws JobExecutionException {
-        messageSender.send("myid", Collections.singletonMap("field1", "value1"));
+        messageSender.send(new FutureMessage("myid", "destination", Collections.singletonMap("field1", "value1")));
         final Message<String> message = (Message<String>) collector.forChannel(output).poll();
 
         assertThat(message.getPayload()).isEqualTo("{\"field1\":\"value1\"}");

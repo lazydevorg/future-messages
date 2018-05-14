@@ -12,15 +12,25 @@ import java.util.Map;
 public class Message {
     @NotNull
     @Future
-    private Instant startAt;
+    private Instant start;
+    @NotNull
+    private String destination;
     private Map<String, Object> payload = new HashMap<>();
 
-    public Instant getStartAt() {
-        return startAt;
+    public Instant getStart() {
+        return start;
     }
 
-    public void setStartAt(Instant startAt) {
-        this.startAt = startAt;
+    public void setStart(Instant start) {
+        this.start = start;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
     @JsonAnyGetter
@@ -36,7 +46,7 @@ public class Message {
     @Override
     public String toString() {
         return "Message{" +
-                "startAt=" + startAt +
+                "start=" + start +
                 ", payload=" + payload +
                 '}';
     }

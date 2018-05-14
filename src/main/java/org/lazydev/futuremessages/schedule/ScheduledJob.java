@@ -4,16 +4,16 @@ package org.lazydev.futuremessages.schedule;
 import java.time.Instant;
 
 public class ScheduledJob {
-    private final Instant startAt;
+    private final Instant start;
     private final String triggerId;
 
-    public ScheduledJob(Instant startAt, String triggerId) {
-        this.startAt = startAt;
+    public ScheduledJob(Instant start, String triggerId) {
+        this.start = start;
         this.triggerId = triggerId;
     }
 
-    public Instant getStartAt() {
-        return startAt;
+    public Instant getStart() {
+        return start;
     }
 
     public String getTriggerId() {
@@ -23,7 +23,7 @@ public class ScheduledJob {
     @Override
     public String toString() {
         return "ScheduledJob{" +
-                "startAt=" + startAt +
+                "start=" + start +
                 ", triggerId=" + triggerId +
                 '}';
     }
