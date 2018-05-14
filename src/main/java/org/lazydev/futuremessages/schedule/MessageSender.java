@@ -21,6 +21,7 @@ public class MessageSender {
     private final MessageChannel output;
 
     @Autowired
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public MessageSender(MessageChannel output) {
         this.output = output;
     }

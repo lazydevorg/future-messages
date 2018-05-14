@@ -5,15 +5,13 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.Map;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 class MessageSenderJob implements Job {
-    private static final Logger log = LoggerFactory.getLogger(MessageSenderJob.class);
     private MessageSender messageSender;
     private ObjectMapper objectMapper;
 

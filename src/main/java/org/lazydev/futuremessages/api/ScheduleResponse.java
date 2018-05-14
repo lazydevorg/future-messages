@@ -4,9 +4,9 @@ import org.lazydev.futuremessages.schedule.ScheduledJob;
 
 import java.time.Instant;
 
-public class ScheduleResponse {
-    private Instant start;
-    private String id;
+class ScheduleResponse {
+    private final Instant start;
+    private final String id;
 
     ScheduleResponse(ScheduledJob job) {
         this.start = job.getStart();

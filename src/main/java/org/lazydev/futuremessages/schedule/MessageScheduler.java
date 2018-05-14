@@ -56,12 +56,11 @@ public class MessageScheduler {
         return new TriggerKey(Key.createUniqueName(MESSAGES_GROUP), MESSAGES_GROUP);
     }
 
-    private JobDetail buildJob() throws SchedulerException {
+    private void buildJob() throws SchedulerException {
         JobDetail job = JobBuilder.newJob(MessageSenderJob.class)
                 .withIdentity(MESSAGE_SENDER_JOB_NAME, MESSAGES_GROUP)
                 .storeDurably()
                 .build();
         scheduler.addJob(job, true);
-        return job;
     }
 }

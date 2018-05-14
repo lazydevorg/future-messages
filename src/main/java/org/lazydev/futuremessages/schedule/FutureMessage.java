@@ -3,9 +3,9 @@ package org.lazydev.futuremessages.schedule;
 import java.util.Map;
 
 class FutureMessage {
-    private String id;
-    private String destination;
-    private Map<String, Object> payload;
+    private final String id;
+    private final String destination;
+    private final Map<String, Object> payload;
 
     public FutureMessage(String id, String destination, Map<String, Object> payload) {
         this.id = id;

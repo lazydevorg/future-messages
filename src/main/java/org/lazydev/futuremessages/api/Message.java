@@ -15,7 +15,7 @@ public class Message {
     private Instant start;
     @NotNull
     private String destination;
-    private Map<String, Object> payload = new HashMap<>();
+    private final Map<String, Object> payload = new HashMap<>();
 
     public Instant getStart() {
         return start;
