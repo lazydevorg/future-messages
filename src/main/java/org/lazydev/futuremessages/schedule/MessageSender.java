@@ -30,13 +30,14 @@ public class MessageSender {
                 .setHeader("scheduleId", futureMessage.getId())
                 .setHeader("destination", futureMessage.getDestination())
                 .build();
-        log.debug("Message {}", message);
         try {
-            return output.send(message);
+            final boolean sent = output.send(message);
+            log.info("Message {} sent", futureMessage.getId());
+            return sent;
         } catch (MessageHandlingException e) {
             final JobExecutionException je = new JobExecutionException(e);
             je.setRefireImmediately(true);
-            log.debug("Message send error. Rescheduled!");
+            log.error("Message {} send error. Rescheduled!", futureMessage.getId());
             throw je;
         }
     }

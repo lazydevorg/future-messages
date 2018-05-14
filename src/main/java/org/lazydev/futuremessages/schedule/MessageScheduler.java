@@ -35,8 +35,10 @@ public class MessageScheduler {
 
     public ScheduledJob schedule(Message message) throws SchedulerException, JsonProcessingException {
         Trigger trigger = buildTrigger(message);
-        Instant date = scheduler.scheduleJob(trigger).toInstant();
-        return new ScheduledJob(date, trigger.getKey().getName());
+        Instant startAt = scheduler.scheduleJob(trigger).toInstant();
+        final String triggerId = trigger.getKey().getName();
+        log.info("Job {} scheduled for {}", triggerId, startAt);
+        return new ScheduledJob(startAt, triggerId);
     }
 
     private Trigger buildTrigger(Message message) throws JsonProcessingException {
