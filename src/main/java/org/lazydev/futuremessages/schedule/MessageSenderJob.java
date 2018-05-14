@@ -19,12 +19,16 @@ class MessageSenderJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
+        FutureMessage futureMessage = buildFutureMessage(context);
+        messageSender.send(futureMessage);
+    }
+
+    private FutureMessage buildFutureMessage(JobExecutionContext context) throws JobExecutionException {
         final String id = getTriggerId(context);
         JobDataMap jobData = context.getMergedJobDataMap();
         String destination = getDestination(jobData);
-        Map payload = getPayload(jobData);
-        FutureMessage futureMessage = new FutureMessage(id, destination, payload);
-        messageSender.send(futureMessage);
+        Map<String, Object> payload = getPayload(jobData);
+        return new FutureMessage(id, destination, payload);
     }
 
     private String getDestination(JobDataMap jobData) {
@@ -35,7 +39,8 @@ class MessageSenderJob implements Job {
         return context.getTrigger().getKey().getName();
     }
 
-    private Map getPayload(JobDataMap jobData) throws JobExecutionException {
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getPayload(JobDataMap jobData) throws JobExecutionException {
         try {
             return objectMapper.readValue(jobData.getString("payload"), Map.class);
         } catch (IOException e) {
