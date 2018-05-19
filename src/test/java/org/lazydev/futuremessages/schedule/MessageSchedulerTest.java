@@ -14,8 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.sql.Date;
 import java.time.Instant;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -43,9 +43,9 @@ public class MessageSchedulerTest {
     @Test
     public void scheduleJob() throws SchedulerException, JsonProcessingException {
         final MessageScheduler messageScheduler = new MessageScheduler(scheduler, objectMapper);
-        final Instant now = Instant.now();
+        final Date now = Date.from(Instant.now());
         ArgumentCaptor<Trigger> captor = ArgumentCaptor.forClass(Trigger.class);
-        given(scheduler.scheduleJob(captor.capture())).willReturn(Date.from(now));
+        given(scheduler.scheduleJob(captor.capture())).willReturn(now);
 
         final Message message = new Message();
         message.setStart(Instant.now());
@@ -56,6 +56,6 @@ public class MessageSchedulerTest {
 
         assertThat(scheduledJob)
                 .extracting("start", "triggerId")
-                .contains(now, trigger.getKey().getName());
+                .contains(now.toInstant(), trigger.getKey().getName());
     }
 }
