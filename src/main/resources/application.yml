@@ -19,6 +19,14 @@ spring:
       org.quartz.threadPool.threadCount: 4
       org.quartz.jobStore.isClustered: true
 
+  cloud:
+    stream:
+      rabbit:
+        bindings:
+          output:
+            producer:
+              routing-key-expression: "headers.destination"
+
   rabbitmq:
     template:
       retry:
