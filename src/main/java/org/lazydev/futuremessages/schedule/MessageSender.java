@@ -1,5 +1,7 @@
 package org.lazydev.futuremessages.schedule;
 
+import brave.Tracer;
+import org.lazydev.futuremessages.tracing.TracingHelper;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,19 +21,19 @@ import java.util.Map;
 public class MessageSender {
     private static final Logger log = LoggerFactory.getLogger(MessageSender.class);
     private final MessageChannel output;
+    private final TracingHelper tracingHelper;
 
     @Autowired
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public MessageSender(MessageChannel output) {
+    public MessageSender(MessageChannel output, TracingHelper tracingHelper) {
         this.output = output;
+        this.tracingHelper = tracingHelper;
     }
 
-    public boolean send(FutureMessage futureMessage) throws JobExecutionException {
-        Message<Map<String, Object>> message = MessageBuilder.withPayload(futureMessage.getPayload())
-                .setHeader("scheduleId", futureMessage.getId())
-                .setHeader("destination", futureMessage.getDestination())
-                .build();
-        try {
+    public boolean send(FutureMessage futureMessage, MessageMetadata metadata) throws JobExecutionException {
+        Message<Map<String, Object>> message = getMessage(futureMessage);
+        Tracer.SpanInScope trace = tracingHelper.joinTrace(metadata.getTraceId(), metadata.getSampled());
+        try (trace) {
             final boolean sent = output.send(message);
             log.info("Message {} sent", futureMessage.getId());
             return sent;
@@ -41,5 +43,12 @@ public class MessageSender {
             log.error("Message {} send error. Rescheduled!", futureMessage.getId());
             throw je;
         }
+    }
+
+    private Message<Map<String, Object>> getMessage(FutureMessage futureMessage) {
+        return MessageBuilder.withPayload(futureMessage.getPayload())
+                .setHeader("scheduleId", futureMessage.getId())
+                .setHeader("destination", futureMessage.getDestination())
+                .build();
     }
 }

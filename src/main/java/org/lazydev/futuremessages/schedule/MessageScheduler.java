@@ -3,6 +3,7 @@ package org.lazydev.futuremessages.schedule;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.lazydev.futuremessages.api.Message;
+import org.lazydev.futuremessages.tracing.TracingHelper;
 import org.quartz.*;
 import org.quartz.utils.Key;
 import org.slf4j.Logger;
@@ -21,11 +22,13 @@ public class MessageScheduler {
     private static final String MESSAGE_SENDER_JOB_NAME = "MessageSender";
     private final Scheduler scheduler;
     private final ObjectMapper objectMapper;
+    private final TracingHelper tracingHelper;
 
     @Autowired
-    public MessageScheduler(Scheduler scheduler, ObjectMapper objectMapper) {
+    public MessageScheduler(Scheduler scheduler, ObjectMapper objectMapper, TracingHelper tracingHelper) {
         this.scheduler = scheduler;
         this.objectMapper = objectMapper;
+        this.tracingHelper = tracingHelper;
     }
 
     @PostConstruct
@@ -47,9 +50,17 @@ public class MessageScheduler {
                 .forJob(MESSAGE_SENDER_JOB_NAME, MESSAGES_GROUP)
                 .usingJobData("destination", message.getDestination())
                 .usingJobData("payload", objectMapper.writeValueAsString(message.getPayload()))
+                .usingJobData("metadata", objectMapper.writeValueAsString(buildMetadata()))
                 .startAt(Date.from(message.getStart()))
 //                .startAt(Date.from(Instant.now()))
                 .build();
+    }
+
+    private MessageMetadata buildMetadata() {
+        MessageMetadata metadata = new MessageMetadata();
+        metadata.setTraceId(tracingHelper.traceId());
+        metadata.setSampled(tracingHelper.sampled());
+        return metadata;
     }
 
     private TriggerKey getTriggerKey() {

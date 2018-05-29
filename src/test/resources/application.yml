@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:future-messages;MVCC=TRUE
+
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
+    properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+      org.quartz.scheduler.instanceId: AUTO
+      org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool
+      org.quartz.threadPool.threadCount: 4
+      org.quartz.jobStore.isClustered: true

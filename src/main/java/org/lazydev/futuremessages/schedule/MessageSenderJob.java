@@ -18,7 +18,8 @@ class MessageSenderJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         FutureMessage futureMessage = buildFutureMessage(context);
-        messageSender.send(futureMessage);
+        MessageMetadata metadata = buildMetadata(context);
+        messageSender.send(futureMessage, metadata);
     }
 
     private FutureMessage buildFutureMessage(JobExecutionContext context) throws JobExecutionException {
@@ -27,6 +28,10 @@ class MessageSenderJob implements Job {
         String destination = getDestination(jobData);
         Map<String, Object> payload = getPayload(jobData);
         return new FutureMessage(id, destination, payload);
+    }
+
+    private MessageMetadata buildMetadata(JobExecutionContext context) throws JobExecutionException {
+        return getMetadata(context.getMergedJobDataMap());
     }
 
     private String getDestination(JobDataMap jobData) {
@@ -39,10 +44,18 @@ class MessageSenderJob implements Job {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> getPayload(JobDataMap jobData) throws JobExecutionException {
+        return parseJson(jobData, "payload", Map.class);
+    }
+
+    private MessageMetadata getMetadata(JobDataMap jobData) throws JobExecutionException {
+        return parseJson(jobData, "metadata", MessageMetadata.class);
+    }
+
+    private <T> T parseJson(JobDataMap jobData, String key, Class<T> clazz) throws JobExecutionException {
         try {
-            return objectMapper.readValue(jobData.getString("payload"), Map.class);
+            return objectMapper.readValue(jobData.getString(key), clazz);
         } catch (IOException e) {
-            throw new JobExecutionException("The job payload is not a valid json", e);
+            throw new JobExecutionException("The job metadata is not a valid json", e);
         }
     }
 

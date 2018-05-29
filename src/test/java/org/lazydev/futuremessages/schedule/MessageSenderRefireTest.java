@@ -2,6 +2,7 @@ package org.lazydev.futuremessages.schedule;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.lazydev.futuremessages.tracing.TracingHelper;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,15 +29,22 @@ public class MessageSenderRefireTest {
     @Autowired
     private MessageSender messageSender;
 
+    @MockBean
+    private TracingHelper tracingHelper;
+
     @Test
     public void refireImmediatelyOnError() {
         final MessageHandlingException messageHandlingException = new MessageHandlingException(
                 mock(GenericMessage.class), "Something went wrong!");
 
+        MessageMetadata metadata = new MessageMetadata();
+        metadata.setTraceId(1234L);
+        metadata.setSampled(true);
+
         given(output.send(any())).willThrow(messageHandlingException);
 
         assertThatExceptionOfType(JobExecutionException.class)
-                .isThrownBy(() -> messageSender.send(new FutureMessage("myid", "destination", Collections.singletonMap("field1", "value1"))))
+                .isThrownBy(() -> messageSender.send(new FutureMessage("myid", "destination", Collections.singletonMap("field1", "value1")), metadata))
                 .satisfies(e -> assertThat(e.refireImmediately())
                         .describedAs("Job set for immediate refire")
                         .isTrue());
