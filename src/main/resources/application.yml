@@ -4,7 +4,9 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:h2:mem:future-messages;MVCC=TRUE
+    url: jdbc:postgresql://localhost:5432/futuremessages
+    username: futuremessages
+    password: messages
 
   quartz:
     job-store-type: jdbc
