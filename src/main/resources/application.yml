@@ -1,6 +1,6 @@
-logging:
-  level:
-    org.lazydev.futuremessages: DEBUG
+#logging:
+#  level:
+#    root: info
 
 spring:
   datasource:
@@ -21,11 +21,14 @@ spring:
 
   cloud:
     stream:
+      bindings:
+        output:
+          destination: ${EXCHANGE_NAME:future-messages}
       rabbit:
         bindings:
           output:
             producer:
-              routing-key-expression: "headers.destination"
+              routing-key-expression: headers.destination
 
   rabbitmq:
     template:
