@@ -13,6 +13,7 @@ spring:
     jdbc:
       initialize-schema: always
     properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.scheduler.instanceId: AUTO
       org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool
       org.quartz.threadPool.threadCount: 4
