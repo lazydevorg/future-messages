@@ -20,12 +20,4 @@ class ScheduleResponse {
     public String getId() {
         return id;
     }
-
-    @Override
-    public String toString() {
-        return "ScheduleResponse{" +
-                "start=" + start +
-                ", id='" + id + '\'' +
-                '}';
-    }
 }

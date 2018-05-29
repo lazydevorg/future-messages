@@ -42,12 +42,4 @@ public class Message {
     public void setPayloadData(String key, Object value) {
         payload.put(key, value);
     }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "start=" + start +
-                ", payload=" + payload +
-                '}';
-    }
 }

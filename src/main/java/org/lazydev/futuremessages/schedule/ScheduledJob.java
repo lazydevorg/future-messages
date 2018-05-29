@@ -19,12 +19,4 @@ public class ScheduledJob {
     public String getTriggerId() {
         return triggerId;
     }
-
-    @Override
-    public String toString() {
-        return "ScheduledJob{" +
-                "start=" + start +
-                ", triggerId=" + triggerId +
-                '}';
-    }
 }
