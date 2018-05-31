@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+import static net.logstash.logback.argument.StructuredArguments.value;
+
 @Service
 @EnableBinding(Source.class)
 public class MessageSender {
@@ -37,7 +39,7 @@ public class MessageSender {
             runBeforeSendInterceptors(futureMessage, message);
             sent = output.send(message);
             if (sent) {
-                log.info("Message {} sent", futureMessage.getId());
+                log.info("Message {} sent", value("triggerId", futureMessage.getId()));
                 runOnSuccessInterceptors(futureMessage, message);
             } else {
                 runOnFailInterceptors(futureMessage, message);
@@ -46,7 +48,7 @@ public class MessageSender {
         } catch (MessageHandlingException e) {
             final JobExecutionException je = new JobExecutionException(e);
             je.setRefireImmediately(true);
-            log.error("Message {} send error. Rescheduled!", futureMessage.getId());
+            log.error("Message {} send error. Rescheduled!", value("triggerId", futureMessage.getId()));
             runOnFailInterceptors(futureMessage, message);
             throw je;
         } finally {

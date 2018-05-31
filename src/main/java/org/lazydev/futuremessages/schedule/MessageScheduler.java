@@ -16,6 +16,8 @@ import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Date;
 
+import static net.logstash.logback.argument.StructuredArguments.value;
+
 @Service
 public class MessageScheduler {
     private static final Logger log = LoggerFactory.getLogger(MessageScheduler.class);
@@ -41,7 +43,7 @@ public class MessageScheduler {
         Trigger trigger = buildTrigger(message);
         Instant startAt = scheduler.scheduleJob(trigger).toInstant();
         final String triggerId = trigger.getKey().getName();
-        log.info("Job {} scheduled for {}", triggerId, startAt);
+        log.info("Job {} scheduled for {}", value("triggerId", triggerId), value("start", startAt));
         return new ScheduledJob(startAt, triggerId);
     }
 
