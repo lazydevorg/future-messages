@@ -2,16 +2,17 @@ package org.lazydev.futuremessages.schedule;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.lazydev.futuremessages.api.Message;
-import org.lazydev.futuremessages.tracing.TracingHelper;
+import org.lazydev.futuremessages.interceptors.InterceptorException;
+import org.lazydev.futuremessages.interceptors.SchedulerInterceptorManager;
 import org.mockito.ArgumentCaptor;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -25,23 +26,19 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @RunWith(SpringRunner.class)
+@SpringBootTest
 public class MessageSchedulerTest {
     @MockBean
     private Scheduler scheduler;
 
     @MockBean
-    private TracingHelper tracingHelper;
+    private SchedulerInterceptorManager interceptorManager;
 
-    private ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
-
-    @Before
-    public void mockTracer() {
-        given(tracingHelper.traceId()).willReturn(1234L);
-    }
+    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
 
     @Test
     public void createsJobOnInit() throws SchedulerException {
-        final MessageScheduler messageScheduler = new MessageScheduler(scheduler, objectMapper, tracingHelper);
+        final MessageScheduler messageScheduler = new MessageScheduler(scheduler, objectMapper, interceptorManager);
         messageScheduler.init();
         ArgumentCaptor<JobDetail> captor = ArgumentCaptor.forClass(JobDetail.class);
         verify(scheduler).addJob(captor.capture(), eq(true));
@@ -51,8 +48,8 @@ public class MessageSchedulerTest {
     }
 
     @Test
-    public void scheduleJob() throws SchedulerException, JsonProcessingException {
-        final MessageScheduler messageScheduler = new MessageScheduler(scheduler, objectMapper, tracingHelper);
+    public void scheduleJob() throws SchedulerException, JsonProcessingException, InterceptorException {
+        final MessageScheduler messageScheduler = new MessageScheduler(scheduler, objectMapper, interceptorManager);
         final Date now = Date.from(Instant.now());
         ArgumentCaptor<Trigger> captor = ArgumentCaptor.forClass(Trigger.class);
         given(scheduler.scheduleJob(captor.capture())).willReturn(now);

@@ -2,7 +2,7 @@ package org.lazydev.futuremessages.schedule;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.lazydev.futuremessages.tracing.TracingHelper;
+import org.lazydev.futuremessages.interceptors.SchedulerInterceptorManager;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,14 +29,12 @@ public class MessageSenderTest {
     private MessageSender messageSender;
 
     @MockBean
-    private TracingHelper tracingHelper;
+    private SchedulerInterceptorManager interceptorManager;
 
     @Test
+    @SuppressWarnings("unchecked")
     public void send() throws JobExecutionException {
-        MessageMetadata metadata = new MessageMetadata();
-        metadata.setTraceId(1234L);
-        metadata.setSampled(true);
-        messageSender.send(new FutureMessage("myid", "destination", Collections.singletonMap("field1", "value1")), metadata);
+        messageSender.send(new FutureMessage("myid", "destination", Collections.singletonMap("field1", "value1")));
         final Message<String> message = (Message<String>) collector.forChannel(output).poll();
 
         assertThat(message.getPayload()).isEqualTo("{\"field1\":\"value1\"}");

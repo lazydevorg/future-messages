@@ -3,7 +3,8 @@ package org.lazydev.futuremessages.schedule;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.lazydev.futuremessages.api.Message;
-import org.lazydev.futuremessages.tracing.TracingHelper;
+import org.lazydev.futuremessages.interceptors.InterceptorException;
+import org.lazydev.futuremessages.interceptors.SchedulerInterceptorManager;
 import org.quartz.*;
 import org.quartz.utils.Key;
 import org.slf4j.Logger;
@@ -22,13 +23,13 @@ public class MessageScheduler {
     private static final String MESSAGE_SENDER_JOB_NAME = "MessageSender";
     private final Scheduler scheduler;
     private final ObjectMapper objectMapper;
-    private final TracingHelper tracingHelper;
+    private final SchedulerInterceptorManager interceptorManager;
 
     @Autowired
-    public MessageScheduler(Scheduler scheduler, ObjectMapper objectMapper, TracingHelper tracingHelper) {
+    public MessageScheduler(Scheduler scheduler, ObjectMapper objectMapper, SchedulerInterceptorManager interceptorManager) {
         this.scheduler = scheduler;
         this.objectMapper = objectMapper;
-        this.tracingHelper = tracingHelper;
+        this.interceptorManager = interceptorManager;
     }
 
     @PostConstruct
@@ -36,7 +37,7 @@ public class MessageScheduler {
         buildJob();
     }
 
-    public ScheduledJob schedule(Message message) throws SchedulerException, JsonProcessingException {
+    public ScheduledJob schedule(Message message) throws SchedulerException, JsonProcessingException, InterceptorException {
         Trigger trigger = buildTrigger(message);
         Instant startAt = scheduler.scheduleJob(trigger).toInstant();
         final String triggerId = trigger.getKey().getName();
@@ -44,23 +45,16 @@ public class MessageScheduler {
         return new ScheduledJob(startAt, triggerId);
     }
 
-    private Trigger buildTrigger(Message message) throws JsonProcessingException {
-        return TriggerBuilder.newTrigger()
+    private Trigger buildTrigger(Message message) throws JsonProcessingException, InterceptorException {
+        TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger()
                 .withIdentity(getTriggerKey())
                 .forJob(MESSAGE_SENDER_JOB_NAME, MESSAGES_GROUP)
                 .usingJobData("destination", message.getDestination())
                 .usingJobData("payload", objectMapper.writeValueAsString(message.getPayload()))
-                .usingJobData("metadata", objectMapper.writeValueAsString(buildMetadata()))
-                .startAt(Date.from(message.getStart()))
-//                .startAt(Date.from(Instant.now()))
-                .build();
-    }
-
-    private MessageMetadata buildMetadata() {
-        MessageMetadata metadata = new MessageMetadata();
-        metadata.setTraceId(tracingHelper.traceId());
-        metadata.setSampled(tracingHelper.sampled());
-        return metadata;
+                .startAt(Date.from(message.getStart()));
+//                .startAt(Date.from(Instant.now()));
+        interceptorManager.buildTrigger(triggerBuilder, message);
+        return triggerBuilder.build();
     }
 
     private TriggerKey getTriggerKey() {

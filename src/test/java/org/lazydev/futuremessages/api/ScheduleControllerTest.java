@@ -33,7 +33,7 @@ public class ScheduleControllerTest {
     @MockBean
     private MessageScheduler scheduler;
 
-    private ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
+    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
 
     private String buildMessageJson(Instant start) throws JsonProcessingException {
         Message message = new Message();
