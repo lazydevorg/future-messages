@@ -30,6 +30,14 @@ spring:
             producer:
               routing-key-expression: headers.destination
 
+  sleuth:
+    sampler:
+      probability: 1.0
+
+  zipkin:
+    service:
+      name: future-messages
+
   rabbitmq:
     template:
       retry:

@@ -13,3 +13,11 @@ services:
       - "POSTGRES_USER=futuremessages"
       - "POSTGRES_PASSWORD=messages"
       - "POSTGRES_DB=futuremessages"
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    environment:
+      - "RABBIT_ADDRESSES=rabbitmq:5672"
+    depends_on:
+      - rabbitmq
