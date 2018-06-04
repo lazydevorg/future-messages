@@ -20,12 +20,16 @@ public class TracingHelper {
         return context().traceId();
     }
 
+    public Long parentId() {
+        return context().parentId();
+    }
+
     public boolean sampled() {
         return context().sampled();
     }
 
-    public Tracer.SpanInScope joinTrace(Long traceId, boolean sampled) {
-        return tracer.withSpanInScope(buildSpan(traceId, sampled));
+    public Tracer.SpanInScope joinTrace(Long traceId, Long parentId, boolean sampled) {
+        return tracer.withSpanInScope(buildSpan(traceId, parentId, sampled));
     }
 
     private Span currentSpan() {
@@ -36,13 +40,14 @@ public class TracingHelper {
         return currentSpan().context();
     }
 
-    private Span buildSpan(Long traceId, boolean sampled) {
-        return tracer.toSpan(buildTraceContext(traceId, sampled));
+    private Span buildSpan(Long traceId, Long parentId, boolean sampled) {
+        return tracer.toSpan(buildTraceContext(traceId, parentId, sampled));
     }
 
-    private TraceContext buildTraceContext(Long traceId, boolean sampled) {
+    private TraceContext buildTraceContext(Long traceId, Long parentId, boolean sampled) {
         return TraceContext.newBuilder()
                 .traceId(traceId)
+                .parentId(parentId)
                 .spanId(random.nextLong())
                 .sampled(sampled)
                 .build();

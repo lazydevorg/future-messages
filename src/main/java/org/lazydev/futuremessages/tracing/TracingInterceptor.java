@@ -47,7 +47,7 @@ public class TracingInterceptor implements SchedulerInterceptor {
     @Override
     public void beforeSend(FutureMessage futureMessage, org.springframework.messaging.Message message) {
         TracingData tracingData = futureMessage.getMetadata(TRACING_INTERCEPTOR_DATA_KEY, TracingData.class);
-        Tracer.SpanInScope spanInScope = tracingHelper.joinTrace(tracingData.getTraceId(), tracingData.isSampled());
+        Tracer.SpanInScope spanInScope = tracingHelper.joinTrace(tracingData.getTraceId(), tracingData.getParentId(), tracingData.isSampled());
         tracingData.setSpanInScope(spanInScope);
     }
 
@@ -60,12 +60,14 @@ public class TracingInterceptor implements SchedulerInterceptor {
     private TracingData buildTracingData() {
         TracingData tracingData = new TracingData();
         tracingData.setTraceId(tracingHelper.traceId());
+        tracingData.setParentId(tracingHelper.parentId());
         tracingData.setSampled(tracingHelper.sampled());
         return tracingData;
     }
 
     static class TracingData {
         private long traceId;
+        private Long parentId;
         private boolean sampled;
         private Tracer.SpanInScope spanInScope;
 
@@ -75,6 +77,14 @@ public class TracingInterceptor implements SchedulerInterceptor {
 
         public void setTraceId(long traceId) {
             this.traceId = traceId;
+        }
+
+        public Long getParentId() {
+            return parentId;
+        }
+
+        public void setParentId(Long parentId) {
+            this.parentId = parentId;
         }
 
         public boolean isSampled() {

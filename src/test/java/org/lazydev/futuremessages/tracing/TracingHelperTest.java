@@ -25,14 +25,16 @@ public class TracingHelperTest {
         Span span = tracer.nextSpan();
         tracer.withSpanInScope(span);
         assertThat(tracingHelper.traceId()).isEqualTo(span.context().traceId());
+        assertThat(tracingHelper.parentId()).isEqualTo(span.context().parentId());
         assertThat(tracingHelper.sampled()).isEqualTo(span.context().sampled());
     }
 
     @Test
     public void joinTrace() {
-        tracingHelper.joinTrace(1234L, true);
+        tracingHelper.joinTrace(1234L, Long.valueOf(4321L), true);
         TraceContext context = tracer.currentSpan().context();
         assertThat(context.traceId()).isEqualTo(1234L);
+        assertThat(context.parentId()).isEqualTo(4321L);
         assertThat(context.sampled()).isEqualTo(true);
     }
 }
