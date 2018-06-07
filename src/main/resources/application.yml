@@ -42,3 +42,13 @@ spring:
     template:
       retry:
         enabled: true
+
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: info, health, prometheus, beans, configprops, metrics
