@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     environment:
       - "POSTGRES_USER=futuremessages"
-      - "POSTGRES_PASSWORD=messages"
+      - "POSTGRES_PASSWORD=futuremessages"
       - "POSTGRES_DB=futuremessages"
   zipkin:
     image: openzipkin/zipkin

@@ -1,0 +1,18 @@
+App -> Future Messages: POST /schedule
+
+Note:
+The request's body contains the instant and the payload of the event that will be sent in the future
+
+Future Messages --> App: Response containing the ID of the message scheduled
+
+Future Messages -> Future Messages: wait for the time to send the next event
+
+Future Messages -> RabbitMQ: send event to the configured exchange
+
+Note:
+The message sent to RabbitMQ contains the payload sent by `App` plus few more headers. 1) `scheduleId`: message id returned in the schedule request. Used to correlate the schedule request with the message received. 2) `routingKey`: containing the name of the destination application. This is used to allow the application to listen only for their events and allowing listening to all events if needed.
+
+RabbitMQ -> App: send the scheduled message to the configured exchange.
+
+Note:
+`App` will receive the event on its queue and run the logic needed
