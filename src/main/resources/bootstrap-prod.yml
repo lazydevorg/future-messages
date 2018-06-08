@@ -5,4 +5,5 @@ spring:
 logging:
   format: text
   level:
-    root: info
+    root: error
+    org.lazydev.futuremessages: info
