@@ -90,9 +90,54 @@ TODO: add docker section
 
 ## Configuration
 
-TODO: write about scheduler table creation (permission, etc)
+FM is a [Spring Boot 2](https://spring.io/projects/spring-boot) application so easily configurable.
+Following the environment variables, and default values, to define in order to configure FM:
 
-TODO: monitoring
+```
+SPRING_DATASOURCE_URL = "jdbc:postgresql://localhost:5432/futuremessages"
+SPRING_DATASOURCE_USERNAME = "futuremessages"
+SPRING_DATASOURCE_PASSWORD = "futuremessages"
+
+EXCHANGE_NAME = "future-messages"   # RabbitMQ exchange name
+
+LOGGING_FORMAT = "text" | "json"
+```
+
+### Database
+
+When FM starts it creates the database schema, if not previously created. This means that the database user has to have
+permission to do so.
+
+The database schema is handled by the [Quartz scheduler](http://www.quartz-scheduler.org/) so please refer to its
+documentation for more details.
+
+## Monitoring
+
+The default monitoring system is [Prometheus](https://prometheus.io/) available through
+[Spring Boot Actuators](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html)
+at the endpoint `/actuator/prometheus`. Many metrics are provided by default plus three custom ones:
+
+```
+# TYPE scheduler_scheduled_total counter
+scheduler_scheduled_total 363.0                    (1)
+
+# TYPE scheduler_triggers_total counter
+scheduler_triggers_total{event="fired"} 363.0      (2)
+scheduler_triggers_total{event="misfired"} 0.0     (3)
+```
+
+1. The number of successful schedule requests.
+2. The number of future messages sent.
+3. The number of future messages that were sent after the scheduled time. This can happen when all the scheduler
+thread are busy. In this case the future message will send as soon as there is availability in the thread pool. This
+will be configurable in the future.
+
+The number of misfired events (3) is a useful indicator to understand if the number of threads available are enough to
+handle the amount of future messages to send. Monitor this value will help tuning the thread pool. By default 4
+thread are used to serve all the future messages.
+
+## Tracing
+TODO: tracing
 
 ## APIs
-
+TODO: apis
