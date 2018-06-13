@@ -86,8 +86,6 @@ the scheduled job or to delete it.
 
 The future message will then be sent to the caller application through the configured RabbitMQ's exchange. 
 
-TODO: add docker section
-
 ## Configuration
 
 FM is a [Spring Boot 2](https://spring.io/projects/spring-boot) application so easily configurable.
