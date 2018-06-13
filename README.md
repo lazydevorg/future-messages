@@ -98,9 +98,15 @@ SPRING_DATASOURCE_URL = "jdbc:postgresql://localhost:5432/futuremessages"
 SPRING_DATASOURCE_USERNAME = "futuremessages"
 SPRING_DATASOURCE_PASSWORD = "futuremessages"
 
-EXCHANGE_NAME = "future-messages"   # RabbitMQ exchange name
+EXCHANGE_NAME = "future-messages"                   # RabbitMQ exchange name
 
 LOGGING_FORMAT = "text" | "json"
+
+SPRING_ZIPKIN_ENABLED = true                        # whether send or not tracing events
+SPRING_ZIPKIN_SENDER_TYPE = "rabbit" | "web"        # connect to Zipkin through RabbitMQ or HTTP
+SPRING_ZIPKIN_BASE_URL = "http://localhost:9411/"   # only user for web sender type
+
+SPRING_SLEUTH_SAMPLER_PROBABILITY = 1.0             # percentage of tracing events to send
 ```
 
 ### Database
@@ -137,7 +143,9 @@ handle the amount of future messages to send. Monitor this value will help tunin
 thread are used to serve all the future messages.
 
 ## Tracing
-TODO: tracing
 
-## APIs
-TODO: apis
+FM uses [Zipkin](https://zipkin.io/) for tracing schedule requests and future messages sent. This makes easier to
+integrate FM in a distributed systems since a trace is used to correlate schedule requests with future messages sent.
+Refer to the Zipkin documentation for more details on the topic.
+
+Refer to the *SPRING_ZIPKIN* variables in the configuration section to change the default behaviour.
