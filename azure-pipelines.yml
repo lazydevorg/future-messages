@@ -14,6 +14,7 @@ steps:
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.10'
     jdkArchitectureOption: 'x64'
-    publishJUnitResults: false
+    publishJUnitResults: true
+    testResultsFormat: 'JUnit'
     testResultsFiles: '**/TEST-*.xml'
     goals: 'package'
